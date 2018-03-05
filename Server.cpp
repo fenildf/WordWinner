@@ -184,7 +184,7 @@ void prepareQuestion(std::unique_ptr<Battle> battle)
     battle->now_question = 0;
 
     for(int j = 0 ; j < 5; j++){
-        std::unique_ptr<Question> question = new Question();
+        std::unique_ptr<Question> question(new Question());
         std::string getRandomKey("RANDOMKEY");
         RedisWorker::worker().sendCommand(getRandomKey);
         question->word = RedisWorker::worker().getReply();
@@ -200,10 +200,10 @@ void prepareQuestion(std::unique_ptr<Battle> battle)
                 question->choice.push_back(RedisWorker::worker().getReply());
             }
         }
-        battle->question.push_back(question);
+        battle->question.push_back(std::move(question));
     }
 }
-void preparePlayer(std::unique_ptr<Battle> battle,int playerA_ID, int playerB_ID)
+void preparePlayer(std::unique_ptr<Battle> &&battle,int playerA_ID, int playerB_ID)
 {
     battle->A_score = 0;
     battle->B_score = 0;
@@ -213,9 +213,9 @@ void preparePlayer(std::unique_ptr<Battle> battle,int playerA_ID, int playerB_ID
 
 void battleWithFriend(int fd, char *buffer)
 {
-    std::unique_ptr<Battle> battle = new Battle();
+    std::unique_ptr<Battle> battle(new Battle());
 
-    prepareQuestion(battle);
+    prepareQuestion(std::move(battle));
 //    preparePlayer(battle);
 
 
@@ -240,24 +240,24 @@ int main()
 {
 //    test Redis
 
-//    RedisWorker::worker().connectRedisServer();
-//
-//    Server server(5473);
-//    server.Listen();
-//    server.run();
+    RedisWorker::worker().connectRedisServer();
+
+    Server server(5473);
+    server.Listen();
+    server.run();
     // test MySQL
 
-    std::string ip = "127.0.0.1";
-    std::string user_name = "root";
-    std::string passwd = "Kk19970610-";
-    std::string dbname = "WordWiner";
-    std::cout << "star" << std::endl;
-
-    MySQLWorker sqlWorker(ip, user_name, passwd,dbname);
-    std::cout << "start" << std::endl;
-
-    if(sqlWorker.connectMySQLServer() == 0)
-        std::cout << "OK" << std::endl;
+//    std::string ip = "127.0.0.1";
+//    std::string user_name = "root";
+//    std::string passwd = "Kk19970610-";
+//    std::string dbname = "WordWiner";
+//    std::cout << "star" << std::endl;
+//
+//    MySQLWorker sqlWorker(ip, user_name, passwd,dbname);
+//    std::cout << "start" << std::endl;
+//
+//    if(sqlWorker.connectMySQLServer() == 0)
+//        std::cout << "OK" << std::endl;
     return 0;
 
 }

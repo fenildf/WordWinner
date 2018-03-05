@@ -11,9 +11,11 @@
 class RedisWorker {
 public:
     //RedisWorker(std::string ip, short port);
-    RedisWorker() = default;
     RedisWorker(const RedisWorker &) = delete;
     RedisWorker(RedisWorker &&) = delete;
+    RedisWorker &operator=(const RedisWorker &) = delete;
+    RedisWorker &operator=(RedisWorker &&) = delete;
+
     static RedisWorker& worker();
     int connectRedisServer();
     int reConnectRedisServer();
@@ -26,6 +28,7 @@ public:
     static short redis_port_;
 
 private:
+    RedisWorker() = default;
     void logError();
     redisContext *context_;
     redisReply *reply_;
